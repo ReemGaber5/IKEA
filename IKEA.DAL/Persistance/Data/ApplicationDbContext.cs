@@ -1,4 +1,5 @@
 ﻿using IKEA.DAL.Models.Departments;
+using IKEA.DAL.Models.Employees;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -23,5 +24,6 @@ namespace IKEA.DAL.Persistance.Data
         //    optionsBuilder.UseSqlServer("Server=.;Database=IKEA;User Id=sa;password=0100;Integrated Security=false;");
         //}
         public DbSet<Department> Departments { get; set; }
+        public DbSet<Employee> Employees { get; set; }
     }
 }
