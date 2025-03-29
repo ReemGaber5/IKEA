@@ -1,0 +1,74 @@
+﻿@model EmployeeViewModel
+<div asp-validation-summary="ModelOnly"></div>
+<div class="form-group col-6">
+    <label class="form-label" asp-for="Name"></label>
+    <input asp-for="Name" class="form-control" />
+    <span class="text-danger" asp-validation-for="Name"></span>
+</div>
+<div class="form-group col-6">
+    <label class="form-label" asp-for="Email"></label>
+    <input asp-for="Email" class="form-control" />
+    <span class="text-danger" asp-validation-for="Email"></span>
+</div>
+
+<div class="form-group col-6">
+    <label class="form-label" asp-for="Address"></label>
+    <input asp-for="Address" class="form-control" />
+    <span class="text-danger" asp-validation-for="Address"></span>
+</div>
+
+<div class="form-group col-6">
+    <label class="form-label" asp-for="Age"></label>
+    <input asp-for="Age" class="form-control" />
+    <span class="text-danger" asp-validation-for="Age"></span>
+</div>
+
+<div class="form-group col-6">
+    <label class="form-label" asp-for="salary"></label>
+    <input asp-for="salary" class="form-control" />
+    <span class="text-danger" asp-validation-for="salary"></span>
+</div>
+
+<div class="form-group col-6">
+    <label class="form-label" asp-for="PhoneNUmber"></label>
+    <input asp-for="PhoneNUmber" class="form-control" />
+    <span class="text-danger" asp-validation-for="PhoneNUmber"></span>
+</div>
+
+<div class="form-group col-6">
+    <label class="form-label" asp-for="EmployeeType"></label>
+    <select class="form-control" asp-for="EmployeeType" asp-items="Html.GetEnumSelectList<EmployeeType>() ">
+        <option value="">Choose...</option>
+    </select>
+    <span class="text-danger" asp-validation-for="PhoneNUmber"></span>
+</div>
+
+<div class="form-group col-6">
+    @foreach (Gender gender in Enum.GetValues(typeof(Gender)))
+    {
+        <div>
+            <input type="radio" class="form-check-input" asp-for="Gender" value="@gender" />
+            <label class="form-check-label" asp-for="Gender">@gender</label>
+
+        </div>
+        <span class="text-danger" asp-validation-for="PhoneNUmber"></span>
+
+    }
+</div>
+
+<div class="form-group col-12">
+    <label class="form-label" asp-for="HiringDate"></label>
+    <input asp-for="PhoneNUmber" type="date" class="form-control" />
+    <span class="text-danger" asp-validation-for="HiringDate"></span>
+</div>
+
+<div class="form-group col-12">
+    <div class="form-check">
+        <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+        <label class="form-check-label" asp-for="IsActive"></label>
+        <span class="text-danger" asp-validation-for="IsActive"></span>
+    </div>
+
+</div>
+
+
