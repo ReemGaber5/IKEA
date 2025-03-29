@@ -1,0 +1,20 @@
+﻿@model EmployeeViewModel
+@{
+    ViewData["Title"] = "Create Employee";
+}
+
+<div class="row justify-content-center align-items-center flex-column">
+    <h1 class="col-6 my-4">Create New Employee</h1>
+    <form class="col-6 row" asp-action="Create" method="post">
+        <partial name="Partials/_CreateEditPartial" model="@Model">
+            <div class="mt-4">
+            <input type="submit" value="create" class="btn btn-primary" />
+            <a asp-controller="Department" asp-action="Index" class="btn btn-secondary">Back</a>
+        </div>
+    </form>
+</div>
+@section ValidateScripts
+{
+    <partial name="_ValidationScriptsPartial">
+    }
+

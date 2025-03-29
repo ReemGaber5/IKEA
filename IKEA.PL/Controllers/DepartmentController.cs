@@ -1,6 +1,7 @@
 ﻿using IKEA.BLL.DTOs.Departments;
 using IKEA.BLL.Services.DepartmentServices;
 using Microsoft.AspNetCore.Mvc;
+using IKEA.PL.ViewModel;
 using System.Security.Policy;
 
 namespace IKEA.PL.Controllers
@@ -30,7 +31,8 @@ namespace IKEA.PL.Controllers
 
 
         [HttpPost]
-        public IActionResult Create(CreatedDepartmentDTO department)
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(DepartmentViewModel department)
         {
             if(!ModelState.IsValid)
                 return View(department);
@@ -40,17 +42,21 @@ namespace IKEA.PL.Controllers
 
             try
             {
-                var Result = _departmentService.CreateDepartment(department);
+                var deptDTO = new CreatedDepartmentDTO()
+                {
+                    Name=department.Name,
+                    Code=department.Code,
+                    Description=department.Description,
+                    C0reationDate=department.C0reationDate,
+
+                };
+                var Result = _departmentService.CreateDepartment(deptDTO);
 
                 if (Result > 0)
                     return RedirectToAction(nameof(Index));
 
                 else
-                {
                     Message = "Department Is Not Created";
-                    ModelState.AddModelError(string.Empty, Message);
-                    return View(department);
-                }
 
             }
             catch (Exception ex)
@@ -61,18 +67,12 @@ namespace IKEA.PL.Controllers
                 //check first if environment devlopment show message to develope(using web host environment)
 
                 if (_environment.IsDevelopment())
-                {
-                    Message=ex.Message;
-                    ModelState.AddModelError(string.Empty, Message);
-                    return View(department);
-                }
+                       Message=ex.Message;
                 else
-                {
-                    Message = "Error While Creation"; 
-                    ModelState.AddModelError(string.Empty, Message);
-                    return View(department);
-                }
-            }  
+                    Message = "Error While Creation";
+            }
+            ModelState.AddModelError(string.Empty, Message);
+            return View(department);
         }
 
         [HttpGet]
@@ -104,7 +104,7 @@ namespace IKEA.PL.Controllers
                 return NotFound();
 
             //add this to return object of type UpdatedDepartmentDTO instead of DepartmentDetailsDTO
-            var MappedDepartment = new UpdatedDepartmentDTO()
+            var MappedDepartment = new DepartmentViewModel()
             {
                 Id = department.Id,
                 Name = department.Name,
@@ -120,15 +120,25 @@ namespace IKEA.PL.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(UpdatedDepartmentDTO updatedDepartmentDTO)
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(DepartmentViewModel department)
         {
             if (!ModelState.IsValid)
-                return View(updatedDepartmentDTO);
+                return View(department);
             var Message = string.Empty;
 
             try
             {
-                var Result=_departmentService.UpdateDepartment(updatedDepartmentDTO);
+                var deptDTO = new UpdatedDepartmentDTO()
+                {
+                    Id= department.Id,
+                    Name = department.Name,
+                    Code = department.Code,
+                    Description = department.Description,
+                    C0reationDate = department.C0reationDate,
+
+                };
+                var Result=_departmentService.UpdateDepartment(deptDTO);
                 if (Result > 0)
                     return RedirectToAction(nameof(Index));
                 else
@@ -143,20 +153,14 @@ namespace IKEA.PL.Controllers
                 //check first if environment devlopment show message to develope(using web host environment)
 
                 if (_environment.IsDevelopment())
-                {
                     Message = ex.Message;
-                    ModelState.AddModelError(string.Empty, Message);
-                    return View(updatedDepartmentDTO);
-                }
+
                 else
-                {
                     Message = "Error While Update";
-                    ModelState.AddModelError(string.Empty, Message);
-                    return View(updatedDepartmentDTO);
-                }
+
             }
             ModelState.AddModelError(string.Empty, Message);
-            return View (updatedDepartmentDTO);
+            return View (department);
               
 
         }
@@ -177,6 +181,7 @@ namespace IKEA.PL.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int DeptId)
         {
             var Message = string.Empty;
