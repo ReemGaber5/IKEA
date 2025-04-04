@@ -3,6 +3,12 @@
 @{
     ViewData["Title"] = "Departmnts";
 }
+@if (!string.IsNullOrEmpty(TempData["Message"] as string))
+{
+    <div class="alert alert-success mb-3">
+        <h5>@TempData["Message"] </h5>
+    </div>
+}
 
 <h1>Departments</h1>
 
@@ -38,31 +44,26 @@
 
                    
                 </tr>
-                <div class="modal fade" id="DeleteDepartment" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal fade" id="deleteModal-@dept.Id" tabindex="-1" aria-labelledby="deleteLabel-@dept.Id" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Delete Department</h1>
+                                <h1 class="modal-title fs-5" id="deleteLabel-@dept.Id">Delete Department</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <h4 class="modal-title fs-5" id="exampleModalLabel">Are U Sure To Delete @dept.Name Department?</h4>
-
+                                <h5>Are you sure you want to delete <strong>@dept.Name</strong>?</h5>
                             </div>
                             <div class="modal-footer">
                                 <form asp-action="Delete" method="post" asp-route-DeptId="@dept.Id">
                                     <div asp-validation-summary="ModelOnly"></div>
-                                    <div class="mt-4">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <input type="submit" value="Delete" class="btn btn-danger" />
-                                    </div>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <input type="submit" value="Delete" class="btn btn-danger" />
                                 </form>
-
                             </div>
                         </div>
                     </div>
                 </div>
-
             }
 
         </tbody>

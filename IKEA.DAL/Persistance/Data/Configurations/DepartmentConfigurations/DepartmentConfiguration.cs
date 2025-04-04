@@ -22,6 +22,11 @@ namespace IKEA.DAL.Persistance.Data.Configurations.DepartmentConfigurations
             //calculated with each change 
             builder.Property(D => D.LastModifiedon).HasComputedColumnSql("Getdate()");
 
+            builder.HasMany(D=>D.Employees)
+                    .WithOne(E=>E.Department)
+                    .HasForeignKey(E=>E.DeptId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
 
 
         }

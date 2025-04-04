@@ -4,6 +4,7 @@ using IKEA.BLL.Services.EmployeeServices;
 using Microsoft.AspNetCore.Mvc;
 using IKEA.PL.ViewModel;
 using IKEA.DAL.Models.Employees;
+using IKEA.BLL.Services.DepartmentServices;
 
 namespace IKEA.PL.Controllers
 {
@@ -12,17 +13,19 @@ namespace IKEA.PL.Controllers
         private readonly IEmployeeService _employeeService;
         private readonly ILogger<EmployeeController> _logger;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public EmployeeController(IEmployeeService employeeService,ILogger<EmployeeController> logger, IWebHostEnvironment webHostEnvironment)
+        private readonly IDepartmentService _departmentService;
+        public EmployeeController(IEmployeeService employeeService,ILogger<EmployeeController> logger, IWebHostEnvironment webHostEnvironment, IDepartmentService departmentService)
         {
             _employeeService = employeeService;
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
+            _departmentService = departmentService;
         }
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(string search)
         {
-            var Employees=_employeeService.GetAll();
 
+            var Employees=_employeeService.GetAll(search);
             return View(Employees);
         }
 
@@ -30,6 +33,7 @@ namespace IKEA.PL.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            ViewBag.Departments = _departmentService.GetAll();
             return View();
         }
 
@@ -39,7 +43,11 @@ namespace IKEA.PL.Controllers
         public IActionResult Create(EmployeeViewModel employee)
         {
             if (!ModelState.IsValid)
+            {
+                ViewBag.Departments = _departmentService.GetAll();
                 return View(employee);
+            }
+             
 
             var Message = string.Empty;
 
@@ -57,6 +65,9 @@ namespace IKEA.PL.Controllers
                     Email = employee.Email,
                     EmployeeType = employee.EmployeeType,
                     IsActive = employee.IsActive,
+                    DeptId = employee.DeptId,
+                    PhoneNUmber=employee.PhoneNUmber
+
                 };
                 var Result = _employeeService.CreateEmployee(empDTO);
 
@@ -122,8 +133,11 @@ namespace IKEA.PL.Controllers
                 EmployeeType = employee.EmployeeType,
                 IsActive = employee.IsActive,
                 PhoneNUmber=employee.PhoneNUmber,
+                DeptId = employee.DeptId
 
             };
+            ViewBag.Departments = _departmentService.GetAll();
+
             return View(MappedEmployee);
         }
 
@@ -132,14 +146,20 @@ namespace IKEA.PL.Controllers
         public IActionResult Edit(EmployeeViewModel employee)
         {
             if (!ModelState.IsValid)
+            {
+                ViewBag.Departments = _departmentService.GetAll();
                 return View(employee);
+
+            }
             var Message = string.Empty;
 
             try
             {
                 var empDTO = new UpdatedEmployeeDTO()
                 {
+                    Id=employee.Id,
                     Name = employee.Name,
+                    PhoneNUmber=employee.PhoneNUmber,
                     Age = employee.Age,
                     Address = employee.Address,
                     HiringDate = employee.HiringDate,
@@ -148,6 +168,7 @@ namespace IKEA.PL.Controllers
                     Email = employee.Email,
                     EmployeeType = employee.EmployeeType,
                     IsActive = employee.IsActive,
+                    DeptId = employee.DeptId
                 };
                 var Result = _employeeService.UpdateEmployee(empDTO);
                 if (Result > 0)
@@ -167,6 +188,8 @@ namespace IKEA.PL.Controllers
                     Message = "Error While Update";
             }
             ModelState.AddModelError(string.Empty, Message);
+            ViewBag.Departments = _departmentService.GetAll();
+
             return View(employee);
         }
 

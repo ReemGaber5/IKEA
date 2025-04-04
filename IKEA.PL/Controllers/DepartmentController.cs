@@ -2,6 +2,7 @@
 using IKEA.BLL.Services.DepartmentServices;
 using Microsoft.AspNetCore.Mvc;
 using IKEA.PL.ViewModel;
+using AutoMapper;
 using System.Security.Policy;
 
 namespace IKEA.PL.Controllers
@@ -11,11 +12,13 @@ namespace IKEA.PL.Controllers
         private IDepartmentService _departmentService;
         private readonly ILogger<DepartmentController> _logger;
         private readonly IWebHostEnvironment _environment;
-        public DepartmentController(IDepartmentService departmentService, ILogger<DepartmentController> logger, IWebHostEnvironment environment)
+        private readonly IMapper _mapper;
+        public DepartmentController(IDepartmentService departmentService, ILogger<DepartmentController> logger, IWebHostEnvironment environment,IMapper mapper)
         {
             _departmentService = departmentService;
             _logger = logger;
             _environment = environment;
+            _mapper = mapper;
         }
         public IActionResult Index()
         {
@@ -42,19 +45,23 @@ namespace IKEA.PL.Controllers
 
             try
             {
-                var deptDTO = new CreatedDepartmentDTO()
-                {
-                    Name=department.Name,
-                    Code=department.Code,
-                    Description=department.Description,
-                    C0reationDate=department.C0reationDate,
+                var dept = _mapper.Map<DepartmentViewModel, CreatedDepartmentDTO>(department);
 
-                };
-                var Result = _departmentService.CreateDepartment(deptDTO);
+                //var deptDTO = new CreatedDepartmentDTO()
+                //{
+                //    Name=department.Name,
+                //    Code=department.Code,
+                //    Description=department.Description,
+                //    C0reationDate=department.C0reationDate,
+
+                //};
+                var Result = _departmentService.CreateDepartment(dept);
 
                 if (Result > 0)
+                {
+                    TempData["Message"] = $"{department.Name} Department Created";
                     return RedirectToAction(nameof(Index));
-
+                }
                 else
                     Message = "Department Is Not Created";
 
@@ -62,7 +69,7 @@ namespace IKEA.PL.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-
+                 
                 //set Default message to user 
                 //check first if environment devlopment show message to develope(using web host environment)
 
@@ -104,16 +111,18 @@ namespace IKEA.PL.Controllers
                 return NotFound();
 
             //add this to return object of type UpdatedDepartmentDTO instead of DepartmentDetailsDTO
-            var MappedDepartment = new DepartmentViewModel()
-            {
-                Id = department.Id,
-                Name = department.Name,
-                Code = department.Code,
-                Description = department.Description,
-                C0reationDate = department.C0reationDate
-            };
+            var MappedDept = _mapper.Map<DepartmentDetailsDTO, DepartmentViewModel>(department);
 
-            return View(MappedDepartment );
+            //var MappedDepartment = new DepartmentViewModel()
+            //{
+            //    Id = department.Id,
+            //    Name = department.Name,
+            //    Code = department.Code,
+            //    Description = department.Description,
+            //    C0reationDate = department.C0reationDate
+            //};
+
+            return View(MappedDept);
 
 
 
@@ -129,15 +138,16 @@ namespace IKEA.PL.Controllers
 
             try
             {
-                var deptDTO = new UpdatedDepartmentDTO()
-                {
-                    Id= department.Id,
-                    Name = department.Name,
-                    Code = department.Code,
-                    Description = department.Description,
-                    C0reationDate = department.C0reationDate,
+                var deptDTO=_mapper.Map< DepartmentViewModel,UpdatedDepartmentDTO>(department);
+                //var deptDTO = new UpdatedDepartmentDTO()
+                //{
+                //    Id= department.Id,
+                //    Name = department.Name,
+                //    Code = department.Code,
+                //    Description = department.Description,
+                //    C0reationDate = department.C0reationDate,
 
-                };
+                //};
                 var Result=_departmentService.UpdateDepartment(deptDTO);
                 if (Result > 0)
                     return RedirectToAction(nameof(Index));
