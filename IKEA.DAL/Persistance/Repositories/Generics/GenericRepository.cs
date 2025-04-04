@@ -1,4 +1,5 @@
 ﻿using IKEA.DAL.Models.Departments;
+using IKEA.DAL.Models.Employees;
 using IKEA.DAL.Persistance.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,16 +19,14 @@ namespace IKEA.DAL.Persistance.Repositories.Generics
             _Context = context;
         }
 
-        public int Add(T entity)
+        public void Add(T entity)
         {
             _Context.Set<T>().Add(entity);
-            return _Context.SaveChanges();
         }
 
-        public int Delete(T entity)
+        public void Delete(T entity)
         {
             _Context.Set<T>().Remove(entity);
-            return _Context.SaveChanges();
         }
 
         public IEnumerable<T> GetAll(bool withnotrack = true)
@@ -46,10 +45,16 @@ namespace IKEA.DAL.Persistance.Repositories.Generics
             return item;
         }
 
-        public int Update(T entity)
+        public void Update(T entity)
         {
             _Context.Set<T>().Update(entity);
-            return _Context.SaveChanges();
+        }
+
+        public IEnumerable<Employee> GetAllDepartment()
+        {
+            return _Context.Employees
+                .Include(e => e.Department)
+                .ToList();
         }
     }
 }
