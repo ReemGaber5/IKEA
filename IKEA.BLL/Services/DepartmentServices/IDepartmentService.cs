@@ -9,11 +9,11 @@ namespace IKEA.BLL.Services.DepartmentServices
 {
     public interface IDepartmentService
     {
-        IEnumerable<DepartmentDTO> GetAll();
-        DepartmentDetailsDTO? GetByDepartmentId(int id);
-        int CreateDepartment(CreatedDepartmentDTO createdDepartmentDTO);
-        int UpdateDepartment(UpdatedDepartmentDTO updatedDepartmentDTO);
-        bool DeleteDepartment(int id);
+        Task<IEnumerable<DepartmentDTO>> GetAll();
+        Task<DepartmentDetailsDTO>? GetByDepartmentId(int id);
+        Task<int>CreateDepartment(CreatedDepartmentDTO createdDepartmentDTO);
+        Task<int> UpdateDepartment(UpdatedDepartmentDTO updatedDepartmentDTO);
+        Task<bool> DeleteDepartment(int id);
 
 
     }

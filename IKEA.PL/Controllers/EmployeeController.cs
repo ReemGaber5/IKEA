@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using IKEA.PL.ViewModel;
 using IKEA.DAL.Models.Employees;
 using IKEA.BLL.Services.DepartmentServices;
+using Microsoft.AspNetCore.Http;
 
 namespace IKEA.PL.Controllers
 {
@@ -22,36 +23,33 @@ namespace IKEA.PL.Controllers
             _departmentService = departmentService;
         }
         [HttpGet]
-        public IActionResult Index(string search)
+        public async Task<IActionResult> Index(string search)
         {
 
-            var Employees=_employeeService.GetAll(search);
+            var Employees=await _employeeService.GetAll(search);
             return View(Employees);
         }
 
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewBag.Departments = _departmentService.GetAll();
+            ViewBag.Departments =await _departmentService.GetAll();
             return View();
         }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(EmployeeViewModel employee)
+        public async Task<IActionResult> Create(EmployeeViewModel employee)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Departments = _departmentService.GetAll();
+                ViewBag.Departments =await _departmentService.GetAll();
                 return View(employee);
             }
              
-
             var Message = string.Empty;
-
-
             try
             {
                 var empDTO=new CreatedEmployeeDTO()
@@ -66,10 +64,12 @@ namespace IKEA.PL.Controllers
                     EmployeeType = employee.EmployeeType,
                     IsActive = employee.IsActive,
                     DeptId = employee.DeptId,
-                    PhoneNUmber=employee.PhoneNUmber
+                    PhoneNUmber=employee.PhoneNUmber,
+                    Image=employee.Image,
+
 
                 };
-                var Result = _employeeService.CreateEmployee(empDTO);
+                var Result =await _employeeService.CreateEmployee(empDTO);
 
                 if (Result > 0)
                     return RedirectToAction(nameof(Index));
@@ -92,14 +92,14 @@ namespace IKEA.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return BadRequest();
             }
 
-            var employee = _employeeService.GetByEmployeeId(id.Value);
+            var employee = await _employeeService.GetByEmployeeId(id.Value);
             if (employee == null)
             {
                 return NotFound();
@@ -109,12 +109,12 @@ namespace IKEA.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
                 return BadRequest();
 
-            var employee = _employeeService.GetByEmployeeId(id.Value);
+            var employee =await _employeeService.GetByEmployeeId(id.Value);
 
             if (employee == null)
                 return NotFound();
@@ -133,17 +133,19 @@ namespace IKEA.PL.Controllers
                 EmployeeType = employee.EmployeeType,
                 IsActive = employee.IsActive,
                 PhoneNUmber=employee.PhoneNUmber,
-                DeptId = employee.DeptId
+                DeptId = employee.DeptId,
+                Image=employee.Image,
+                ImageName = employee.ImageName,
 
             };
-            ViewBag.Departments = _departmentService.GetAll();
+            ViewBag.Departments =await _departmentService.GetAll();
 
             return View(MappedEmployee);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(EmployeeViewModel employee)
+        public async Task<IActionResult> Edit(EmployeeViewModel employee)
         {
             if (!ModelState.IsValid)
             {
@@ -168,9 +170,11 @@ namespace IKEA.PL.Controllers
                     Email = employee.Email,
                     EmployeeType = employee.EmployeeType,
                     IsActive = employee.IsActive,
-                    DeptId = employee.DeptId
+                    DeptId = employee.DeptId,
+                    Image=employee.Image,
+                    ImageName=employee.ImageName,
                 };
-                var Result = _employeeService.UpdateEmployee(empDTO);
+                var Result =await _employeeService.UpdateEmployee(empDTO);
                 if (Result > 0)
                     return RedirectToAction(nameof(Index));
                 else
@@ -195,12 +199,12 @@ namespace IKEA.PL.Controllers
 
 
         [HttpGet]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
                 return BadRequest();
 
-            var employee = _employeeService.GetByEmployeeId(id.Value);
+            var employee =await _employeeService.GetByEmployeeId(id.Value);
 
             if (employee == null)
                 return NotFound();
@@ -211,12 +215,12 @@ namespace IKEA.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int EmpId)
+        public async Task<IActionResult> Delete(int EmpId)
         {
             var Message = string.Empty;
             try
             {
-                var IsDeleted = _employeeService.DeleteEmployee(EmpId);
+                var IsDeleted =await _employeeService.DeleteEmployee(EmpId);
                 if (IsDeleted)
                     return RedirectToAction(nameof(Index));
                 Message = "Employee Is Not Deleted";

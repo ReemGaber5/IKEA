@@ -19,7 +19,7 @@ namespace IKEA.BLL.Services.DepartmentServices
             _uow = uow; 
         }
 
-        public int CreateDepartment(CreatedDepartmentDTO createdDepartmentDTO)
+        public async Task<int> CreateDepartment(CreatedDepartmentDTO createdDepartmentDTO)
         {
             var department = new Department()
             {
@@ -32,18 +32,18 @@ namespace IKEA.BLL.Services.DepartmentServices
                 LastModifiedBy = 1,
                 LastModifiedon = DateTime.Now
             };
-            _uow.department.Add(department);
-            return _uow.complete();
+             _uow.department.Add(department);
+            return await _uow.complete();
         }
 
-        public bool DeleteDepartment(int id)
+        public async Task<bool> DeleteDepartment(int id)
         {
-            var department=_uow.department.GetById(id);
+            var department=await _uow.department.GetById(id);
           
 
             if (department != null)
                 _uow.department.Delete(department);
-            var result = _uow.complete();
+            var result = await _uow.complete();
             if (result > 0)
                 return true;
 
@@ -51,7 +51,7 @@ namespace IKEA.BLL.Services.DepartmentServices
             else return false;
         }
 
-        public IEnumerable<DepartmentDTO> GetAll()
+        public async Task<IEnumerable<DepartmentDTO>> GetAll()
         {
             var Departments = _uow.department.GetAll().Select(dept => new DepartmentDTO()
             {
@@ -77,9 +77,9 @@ namespace IKEA.BLL.Services.DepartmentServices
             //return departmentDtos;
         }
 
-        public DepartmentDetailsDTO? GetByDepartmentId(int id)
+        public async Task<DepartmentDetailsDTO>? GetByDepartmentId(int id)
         {
-            var Department=_uow.department.GetById(id);
+            var Department=await _uow.department.GetById(id);
             if (Department != null) 
             {
                 return new DepartmentDetailsDTO()
@@ -101,7 +101,7 @@ namespace IKEA.BLL.Services.DepartmentServices
             return null;
         }
 
-        public int UpdateDepartment(UpdatedDepartmentDTO updatedDepartmentDTO)
+        public async Task<int> UpdateDepartment(UpdatedDepartmentDTO updatedDepartmentDTO)
         {
             var department = new Department()
             {
@@ -114,7 +114,7 @@ namespace IKEA.BLL.Services.DepartmentServices
                 LastModifiedon=DateTime.Now,
             };
             _uow.department.Update(department);
-            return _uow.complete();
+            return await _uow.complete();
         }
     }
 }

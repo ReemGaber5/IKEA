@@ -1,4 +1,5 @@
 ﻿using Azure;
+using IKEA.BLL.Common.Services.Attachments;
 using IKEA.BLL.DTOs.Employees;
 using IKEA.DAL.Common.Enums;
 using IKEA.DAL.Models.Employees;
@@ -10,19 +11,22 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace IKEA.BLL.Services.EmployeeServices
 {
     public class EmployeeService : IEmployeeService
     {
         private readonly IUOW _uow;
+        private readonly IAttachmentService _attachmentService;
 
-        public EmployeeService(IUOW uow)
+        public EmployeeService(IUOW uow, IAttachmentService attachmentService)
         {
             _uow = uow;
+            _attachmentService = attachmentService;
         }
 
-        public int CreateEmployee(CreatedEmployeeDTO createdEmployeeDTO)
+        public async Task<int> CreateEmployee(CreatedEmployeeDTO createdEmployeeDTO)
         {
             var employee = new Employee()
             {
@@ -42,25 +46,38 @@ namespace IKEA.BLL.Services.EmployeeServices
                 LastModifiedon = DateTime.Now,
                 LastModifiedBy = 1
             };
+
+            if (createdEmployeeDTO.Image != null)
+            {
+                employee.ImageName= _attachmentService.UploadImage(createdEmployeeDTO.Image, "Images");
+
+            }
             _uow.employeeRepository.Add(employee);
-            return _uow.complete();
+            return await _uow.complete();
         }
 
-        public bool DeleteEmployee(int id)
+        public async Task<bool> DeleteEmployee(int id)
         {
-            var Employee = _uow.employeeRepository.GetById(id);
+            var Employee =await _uow.employeeRepository.GetById(id);
 
 
             if (Employee != null)
-                _uow.employeeRepository.Delete(Employee);
+            {
+                if (Employee.ImageName != null)
+                {
+                    var filepath=Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Files","Images",Employee.ImageName);
+                    _attachmentService.DeleteImage(filepath);
+                }
+                 _uow.employeeRepository.Delete(Employee);
+            }
 
-            var result = _uow.complete();
+            var result =await _uow.complete();
             if (result > 0)
                 return true;
             else return false;
         }
 
-        public IEnumerable<EmployeeDTO> GetAll(string search)
+        public async Task<IEnumerable<EmployeeDTO>> GetAll(string search)
         {
             return _uow.employeeRepository.GetAllDepartment()
                 .Where(E => !E.IsDeleted && (string.IsNullOrEmpty(search) || E.Name.ToLower().Contains(search.ToLower())))
@@ -79,9 +96,9 @@ namespace IKEA.BLL.Services.EmployeeServices
         }
 
 
-        public EmployeeDetailsDTO? GetByEmployeeId(int id)
+        public async Task<EmployeeDetailsDTO>? GetByEmployeeId(int id)
         {
-            var employee = _uow.employeeRepository.GetById(id);
+            var employee =await _uow.employeeRepository.GetById(id);
             if (employee != null)
             {
                 return new EmployeeDetailsDTO()
@@ -102,14 +119,15 @@ namespace IKEA.BLL.Services.EmployeeServices
                     LastModifiedon = employee.LastModifiedon,
                     CreatedBy = employee.CreatedBy,
                     Createdon = employee.Createdon,
+                    ImageName = employee.ImageName,
                 };
             }
             return null;
         }
 
-        public int UpdateEmployee(UpdatedEmployeeDTO updatedEmployeeDTO)
+        public async Task<int> UpdateEmployee(UpdatedEmployeeDTO updatedEmployeeDTO)
         {
-            var existingEmployee = _uow.employeeRepository.GetById(updatedEmployeeDTO.Id);
+            var existingEmployee =await _uow.employeeRepository.GetById(updatedEmployeeDTO.Id);
             if (existingEmployee == null)
                 return 0;
             existingEmployee.Name = updatedEmployeeDTO.Name;
@@ -125,12 +143,19 @@ namespace IKEA.BLL.Services.EmployeeServices
             existingEmployee.DeptId = updatedEmployeeDTO.DeptId;
             existingEmployee.LastModifiedon = DateTime.Now;
             existingEmployee.LastModifiedBy = 1;
+            existingEmployee.ImageName = updatedEmployeeDTO.ImageName;
 
+            if (updatedEmployeeDTO.Image != null)
+            {
+                if(existingEmployee.ImageName != null)
+                {
+                    var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Files", "Images", existingEmployee.ImageName);
+                    _attachmentService.DeleteImage(filepath);
+                }
+                existingEmployee.ImageName = _attachmentService.UploadImage(updatedEmployeeDTO.Image, "Images");
+            }
             _uow.employeeRepository.Update(existingEmployee);
-            return _uow.complete();
-
-
-
+            return await _uow.complete();
         }
     }
 }

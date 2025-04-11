@@ -18,5 +18,7 @@ namespace IKEA.PL.ViewModel
         public EmployeeType EmployeeType { get; set; }
         [Display(Name ="Department")]
         public int? DeptId { get; set; }
+        public string?ImageName { get; set; }
+        public IFormFile? Image {  get; set; }
     }
 }
