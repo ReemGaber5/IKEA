@@ -20,14 +20,14 @@ namespace IKEA.PL.Controllers
             _environment = environment;
             _mapper = mapper;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var Departments=_departmentService.GetAll();
+            var Departments=await _departmentService.GetAll();
             return View(Departments);
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             return View();
         }
@@ -35,7 +35,7 @@ namespace IKEA.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(DepartmentViewModel department)
+        public async Task<IActionResult> Create(DepartmentViewModel department)
         {
             if(!ModelState.IsValid)
                 return View(department);
@@ -55,7 +55,7 @@ namespace IKEA.PL.Controllers
                 //    C0reationDate=department.C0reationDate,
 
                 //};
-                var Result = _departmentService.CreateDepartment(dept);
+                var Result =await _departmentService.CreateDepartment(dept);
 
                 if (Result > 0)
                 {
@@ -83,14 +83,14 @@ namespace IKEA.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if(id== null)
             {
                 return BadRequest();
             }
 
-            var department = _departmentService.GetByDepartmentId(id.Value);
+            var department =await _departmentService.GetByDepartmentId(id.Value);
             if(department==null)
             {
                 return NotFound();
@@ -100,12 +100,12 @@ namespace IKEA.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
                 return BadRequest();
 
-            var department = _departmentService.GetByDepartmentId(id.Value);
+            var department =await _departmentService.GetByDepartmentId(id.Value);
 
             if (department == null)
                 return NotFound();
@@ -130,7 +130,7 @@ namespace IKEA.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(DepartmentViewModel department)
+        public async Task<IActionResult> Edit(DepartmentViewModel department)
         {
             if (!ModelState.IsValid)
                 return View(department);
@@ -148,7 +148,7 @@ namespace IKEA.PL.Controllers
                 //    C0reationDate = department.C0reationDate,
 
                 //};
-                var Result=_departmentService.UpdateDepartment(deptDTO);
+                var Result=await _departmentService.UpdateDepartment(deptDTO);
                 if (Result > 0)
                     return RedirectToAction(nameof(Index));
                 else
@@ -176,7 +176,7 @@ namespace IKEA.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
                 return BadRequest();
@@ -192,12 +192,12 @@ namespace IKEA.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int DeptId)
+        public async Task<IActionResult> Delete(int DeptId)
         {
             var Message = string.Empty;
             try
             {
-                var IsDeleted = _departmentService.DeleteDepartment(DeptId);
+                var IsDeleted =await _departmentService.DeleteDepartment(DeptId);
                 if (IsDeleted)
                     return RedirectToAction(nameof(Index));
                 Message = "Department Is Not Deleted";

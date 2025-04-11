@@ -1,4 +1,5 @@
 ﻿using IKEA.DAL.Common.Enums;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -29,5 +30,6 @@ namespace IKEA.BLL.DTOs.Employees
         public Gender Gender { get; set; }
         public EmployeeType EmployeeType { get; set; }
         public int? DeptId { get; set; }
+        public IFormFile? Image { get; set; }
     }
 }

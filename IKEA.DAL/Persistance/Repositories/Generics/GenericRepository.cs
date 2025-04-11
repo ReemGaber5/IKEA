@@ -38,10 +38,10 @@ namespace IKEA.DAL.Persistance.Repositories.Generics
             return _Context.Set<T>().ToList();
         }
 
-        public T? GetById(int id)
+        public async Task<T?> GetById(int id)
         {
 
-            var item = _Context.Set<T>().Find(id);
+            var item =await _Context.Set<T>().FindAsync(id);
             return item;
         }
 

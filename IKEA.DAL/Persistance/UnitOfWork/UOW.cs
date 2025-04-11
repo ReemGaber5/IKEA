@@ -23,9 +23,9 @@ namespace IKEA.DAL.Persistance.UnitOfWork
             
         }
 
-        public int complete()
+        public async Task<int> complete()
         {
-          return  _context.SaveChanges();  
+          return await _context.SaveChangesAsync();  
         }
     }
 }
