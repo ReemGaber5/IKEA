@@ -6,9 +6,11 @@ using IKEA.PL.ViewModel;
 using IKEA.DAL.Models.Employees;
 using IKEA.BLL.Services.DepartmentServices;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace IKEA.PL.Controllers
 {
+    [Authorize]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeService _employeeService;
@@ -92,6 +94,7 @@ namespace IKEA.PL.Controllers
         }
 
         [HttpGet]
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -109,6 +112,7 @@ namespace IKEA.PL.Controllers
         }
 
         [HttpGet]
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
