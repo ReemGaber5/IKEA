@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using IKEA.PL.ViewModel;
 using AutoMapper;
 using System.Security.Policy;
+using Microsoft.AspNetCore.Authorization;
 
 namespace IKEA.PL.Controllers
 {
+    [Authorize]
     public class DepartmentController : Controller
     {
         private IDepartmentService _departmentService;
